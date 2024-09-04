@@ -72,7 +72,7 @@ jobs:
         id: check_changes
         run: |
           git diff --exit-code || echo "Changes detected"
-          echo "changes=$(git diff --exit-code || echo 'true')" >> $GITHUB_ENV
+          echo "changes=$(git diff --exit-code || echo 'true')" >> "$GITHUB_ENV"
   
       - name: Commit changes
         if: env.changes == 'true'
