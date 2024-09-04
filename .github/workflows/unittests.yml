@@ -1,0 +1,96 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+
+  # This workflow contains a single job called "super-lint"
+  super-lint:
+    name: Lint code base
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install linters (black, isort, flake8)
+        run: |
+          pip install "black[jupyter]"
+          pip install black
+          pip install isort
+          pip install flake8
+          pip install autoflake
+
+      - name: Run autoflake to remove unused imports
+        run: autoflake --remove-all-unused-imports --in-place --recursive .
+
+      - name: Run isort
+        run: isort .
+
+      - name: Run black
+        run: black .
+
+      - name: Run flake8
+        run: flake8 .
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --exit-code || echo "Changes detected"
+          echo "changes=$(git diff --exit-code || echo 'true')" >> $GITHUB_ENV
+  
+      - name: Commit changes
+        if: env.changes == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Auto-fix code with autoflake, black and isort" || true   
+  
+      - name: Push changes
+        if: env.changes == 'true'
+        env:
+          PAT: ${{ secrets.PAT_TOKEN2 }}
+        run: |
+          git push https://x-access-token:${{ secrets.PAT_TOKEN2 }}@github.com/Yosef-ft/Business_Analysis.git HEAD:${{ github.ref_name }} || true
+       
+      - name: Run Super-Linter
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
