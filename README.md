@@ -12,7 +12,7 @@ This project aims to understand customer behavior and engagement using explorato
 * User Engagement Analysis: Further analyze user engagement metrics and cluster users based on their behavior.
 * Experience Analytics: Evaluate network performance and device characteristics to improve user experience.
 * Satisfaction Analysis: Assess customer satisfaction based on engagement and experience metrics and build predictive models.
-* For detailed scripts and analysis, please refer to the provided Python notebooks and slides.
+* For detailed scripts and analysis, please refer to the provided Python notebooks.
 
 ## How to Use
 
