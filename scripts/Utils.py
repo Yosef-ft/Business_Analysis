@@ -36,6 +36,9 @@ class DatabaseConn:
     
 
 class DataUtils:
+    '''
+    This class is used to clean, visualize and identify outliers from the dataset
+    '''
     def __init__(self,data: pd.DataFrame):
         self.data = data
 
@@ -129,7 +132,7 @@ class DataUtils:
                 else:
                     new_cols.append(item.replace('ms', '(s)'))
         elif type == 'volume':
-            columns_to_standardize = list(self.data.columns[self.data.columns.str.contains('ms')])
+            columns_to_standardize = list(self.data.columns[self.data.columns.str.contains('Bytes')])
             self.data[columns_to_standardize] = self.data[columns_to_standardize] / (1024 * 1024)
             new_cols = []
             for item in columns_to_standardize:
@@ -140,5 +143,7 @@ class DataUtils:
 
 
         self.data.rename(columns=dict(zip(columns_to_standardize, new_cols)), inplace=True)
+
+        return self.data
 
       
