@@ -65,3 +65,21 @@ class OverviewAnalyzer:
 
         
         return result
+    
+
+    def univariant_plot(self, data: pd.DataFrame):
+        '''
+        This funtion plot violin plot for univariant data analysis
+
+        Parameters:
+            data(pd.DataFrame): data to be plotted
+        '''
+        data_melted = data.melt(var_name='Variable', value_name='Value')
+
+        plt.figure(figsize=(10, 8))
+        sns.violinplot(x='Variable', y='Value', data=data_melted, hue='Variable', inner='quart', palette='muted')
+        plt.title('Violin Plots for All Variables')
+        plt.xlabel('Variable')
+        plt.ylabel('Value')     
+        plt.xticks(rotation=45)
+        plt.show()   
