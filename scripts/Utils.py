@@ -111,6 +111,36 @@ class DataUtils:
             plt.tight_layout()
             plt.show()
 
+
+
+    def outlier_remover(self, columns: list) -> pd.DataFrame:
+        '''
+        This funtion removes all the outliers in a data using IQR technique
+
+        Parameters: 
+            columns(list): A list of columns that we don't need to remove the outlier, like unique identifiers
+
+        Returns:
+            pd.DataFrame: A dataframe without outliers
+        '''
+
+        numeric_col = self.data.select_dtypes(include='float64').columns
+        fix_cols = [col for col in numeric_col if col not in columns]
+
+        Q1 = self.data[fix_cols].quantile(0.25)
+        Q3 = self.data[fix_cols].quantile(0.75)
+
+        IQ = Q3 - Q1
+
+        lower_bound = Q1 - 1.5 * IQ
+        upper_bound = Q3 + 1.5 * IQ
+
+        self.data[fix_cols] = self.data[fix_cols].clip(lower=lower_bound, upper=upper_bound, axis=1)
+
+        return self.data  
+    
+
+
     def standardize_data(self, type: str):
         '''
         This function standardizes data:       
