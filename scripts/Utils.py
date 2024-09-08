@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sqlalchemy import create_engine
 
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 
 class DatabaseConn:
     '''
@@ -37,7 +41,7 @@ class DatabaseConn:
 
 class DataUtils:
     '''
-    This class is used to clean, visualize and identify outliers from the dataset
+    This class is used to clean, visualize and identify outliers, calculate PCA from the dataset
     '''
     def __init__(self,data: pd.DataFrame):
         self.data = data
@@ -226,3 +230,34 @@ class DataUtils:
         print(f">>>>>>> The data has been cleaned and outliers removed. \nThe number of null values in your data are {int(self.data.isna().sum().sum())}")
 
         return self.data
+
+
+    def pca_analyzer(self, data: pd.DataFrame, total: bool):
+        '''
+        This function calculates the PCA  and visualizes the results.
+
+        Parameters:
+            data(pd.DataFrame): The input data
+            total(bool): This is whether to perform PCA on aggregate columns or individual columns
+
+        Returns:
+            matplotlib.pyplot plot: A plot showing the PCA results.
+        '''
+
+        scaler = StandardScaler()
+
+        if total:
+            cols = ['Total_duration', 'Total_sessions', 'Total_data']
+        else: 
+            cols = ['Social_media', 'YouTube', 'Netflix', 'Google', 'Email', 'Gaming', 'Other']
+        scaled_data = scaler.fit_transform(data[cols])
+
+        pca = PCA(n_components=2)
+        pca_data = pca.fit_transform(scaled_data)
+
+        plt.figure(figsize=(10, 6))
+        plt.scatter(pca_data[:, 0], pca_data[:, 1], c=data['Total_sessions'], cmap='coolwarm')
+        plt.title('PCA of user behaviour')
+        plt.xlabel('First principal component')
+        plt.ylabel('Second principal component')
+            
