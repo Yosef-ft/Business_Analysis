@@ -177,3 +177,52 @@ class DataUtils:
         return self.data
 
       
+    def data_cleaning(self):
+        '''
+        This function cleans the data and removes outliers. This function is an aggregate of all the functions above.
+
+        Parameters:
+            None
+        
+        Returns:
+            self.data(pd.DataFrame): a cleaned data
+        '''
+
+        self.data['Start'] = pd.to_datetime(self.data['Start'])
+        self.data['End'] = pd.to_datetime(self.data['End'])
+
+        unique_cols = ['Bearer Id', 'IMSI', 'MSISDN/Number', 'IMEI'] # columns that could be used as identifiers
+        self.data = self.outlier_remover(unique_cols)
+
+        self.data = self.standardize_data('time') # changes ms to s
+        self.data = self.standardize_data('volume') # chnages bytes to Mb
+
+        # These columns somehow are unique identifiers so filling them with other values is not a wise choice
+        uni_num_cols = ['MSISDN/Number', 'Bearer Id', 'IMEI'] 
+        uni_obj_cols = ['Last Location Name']
+
+        self.data[uni_num_cols] = self.data[uni_num_cols].fillna(0) # Filling these values with zero to indicat that they are missing
+        self.data[uni_obj_cols] = self.data[uni_obj_cols].fillna('undefined')
+
+        # Although the number of null values are small compared to the dataset size I filled the null values will unkown
+        # so that the analysis dosn't get affect by it.
+        obj_cols = ['Handset Manufacturer', 'Handset Type']
+        self.data[obj_cols] = self.data[obj_cols].fillna('unknown')
+
+
+        miss_date = ['Start', 'End']
+        self.data[miss_date] = self.data[miss_date].fillna(self.data[miss_date].mode(0))
+
+        missing_IMSI = self.data['IMSI'].isna()
+        self.data = self.data[~missing_IMSI]
+
+
+        missing_values_col = list(self.data.columns[self.data.isna().sum() != 0])
+        means = self.data[missing_values_col].mean()
+
+        # Fill missing values in these columns with the computed means
+        self.data[missing_values_col] = self.data[missing_values_col].fillna(means)
+
+        print(f">>>>>>> The data has been cleaned and outliers removed. \nThe number of null values in your data are {int(self.data.isna().sum().sum())}")
+
+        return self.data
