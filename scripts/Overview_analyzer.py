@@ -123,13 +123,29 @@ class OverviewAnalyzer:
         cols = ['Other UL (MB)', 'Other DL (MB)']
         Other = self.per_user_counter(ID,cols, count=False)
 
+        cols = ['TCP DL Retrans. Vol (MB)', 'TCP UL Retrans. Vol (MB)']
+        Avg_TCP  = self.per_user_counter(ID, cols, count=False)
+
+        cols = ['Avg RTT DL (s)', 'Avg RTT UL (s)']
+        Avg_RTT = self.per_user_counter(ID, cols, count=False)
+
+        cols = ['Handset Type']
+        Handset_type = data.groupby(by=ID)['Handset Type'].agg(lambda x: ', '.join(x.unique()))
+
+        cols = ['Avg Bearer TP DL (kbps)', 'Avg Bearer TP UL (kbps)']
+        Avg_Throughput = self.per_user_counter(ID, cols, count=False)
+
         user_behaviour_by_ID = pd.concat([xdr_per_user, session_dur, total_dl_user,
                                     total_ul_user, social_media, YouTube,
                                     Netflix, Google, Email,
-                                    Gaming, Other], axis=1)
+                                    Gaming, Other, Avg_TCP, Avg_RTT, Handset_type,
+                                    Avg_Throughput], axis=1)
 
         user_behaviour_by_ID.columns = ['Total_sessions', 'Total_duration', 'Total_Dl', 'Total_Ul', 'Social_media', 
-                                'YouTube', 'Netflix', 'Google', 'Email', 'Gaming', 'Other']
+                                'YouTube', 'Netflix', 'Google', 'Email', 'Gaming', 'Other', 'Avg_TCP',
+                                'Avg_RTT', 'Handset_type', 'Avg_Throughput']
+        
+        user_behaviour_by_ID['Handset_Count'] = user_behaviour_by_ID['Handset_type'].apply(lambda x: len(x.split(',')))
 
         user_behaviour_by_ID['Total_data'] = user_behaviour_by_ID['Total_Dl'] + user_behaviour_by_ID['Total_Ul']        
 
