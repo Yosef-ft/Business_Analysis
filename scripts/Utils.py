@@ -222,6 +222,13 @@ class DataUtils:
         missing_IMSI = self.data['IMSI'].isna()
         self.data = self.data[~missing_IMSI]
 
+        zero_cols = ['Avg Bearer TP DL (kbps)', 'Avg Bearer TP UL (kbps)', 'TCP DL Retrans. Vol (MB)', 'TCP UL Retrans. Vol (MB)']
+        self.data[zero_cols] = self.data[zero_cols].fillna(0)
+
+        mode_cols = ['Avg RTT DL (s)', 'Avg RTT UL (s)']
+        mode = self.data[mode_cols].mode(0)
+        self.data[mode_cols] = self.data[mode_cols].fillna(mode)
+
 
         missing_values_col = list(self.data.columns[self.data.isna().sum() != 0])
         means = self.data[missing_values_col].mean()
