@@ -41,6 +41,13 @@ class DatabaseConn:
         return df
     
 
+    def save_to_database(self, final_scores: pd.DataFrame):
+        '''
+        This funtion saves dataframe to the database
+        '''
+        final_scores.to_sql('Scores', self.engine, if_exists='replace')
+    
+
 class DataUtils:
     '''
     This class is used to clean, visualize and identify outliers, calculate PCA and perform KMeans clustering from the dataset
@@ -325,7 +332,7 @@ class DataUtils:
 
 
 
-        return data, cluster_stats
+        return data, cluster_stats, kmeans
     
 
     def kmean_elbow(self, cols: list, data: pd.DataFrame):
