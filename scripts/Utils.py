@@ -1,4 +1,6 @@
 import os
+import math
+
 import pandas as pd 
 import numpy as np
 from scipy.stats import zscore
@@ -41,7 +43,7 @@ class DatabaseConn:
 
 class DataUtils:
     '''
-    This class is used to clean, visualize and identify outliers, calculate PCA from the dataset
+    This class is used to clean, visualize and identify outliers, calculate PCA and perform KMeans clustering from the dataset
     '''
     def __init__(self,data: pd.DataFrame):
         self.data = data
@@ -260,4 +262,91 @@ class DataUtils:
         plt.title('PCA of user behaviour')
         plt.xlabel('First principal component')
         plt.ylabel('Second principal component')
-            
+
+
+    def cluster_analysis(self, cols: list, data: pd.DataFrame, n_clusters: int):
+        '''
+        A function used for performing KMeans clustering and visualizing the result
+
+        Parameter:
+            cols(list): The columns that you need to perfom KMeans on
+            data(pd.DataFrame): The data to perform KMeans
+            n_cluster(int): The number of clusters for KMeans
+        
+        Returns:
+            data, cluster_stats(tuple): Returns the data containing clusters and the stats for clusters dataframe         
+        '''
+
+        metrics = data[cols]
+        scaler = StandardScaler()
+        normalized_metrics = scaler.fit_transform(metrics)
+
+        kmeans = KMeans(n_clusters= n_clusters, random_state=42)
+        clusters = kmeans.fit_predict(normalized_metrics)
+
+        
+        data['Cluster'] = clusters       
+
+
+        # Calculating cluster stats
+        stats = []
+
+        for col in cols:
+            result = data.groupby('Cluster').agg({
+            col: ['min', 'max', 'mean', 'sum'],
+            })
+
+            stats.append(result)
+
+        cluster_stats = pd.concat(stats, axis =1).reset_index()
+
+        ncols = 3
+        nrows = math.ceil(len(cols) / ncols)
+        
+        # Create the subplots with the correct number of rows and columns
+        fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(15, 5 * nrows))
+        
+        axes = axes.flatten()
+        
+        # Loop over the columns and plot each one
+        for i, item in enumerate(cols):
+            sns.barplot(x='Cluster', y=cluster_stats[item]['mean'], data=cluster_stats, ax=axes[i])
+            axes[i].set_title(f'Average {item} per Cluster') 
+
+        for j in range(i+1, len(axes)):
+            fig.delaxes(axes[j])   
+
+
+
+        return data, cluster_stats
+    
+
+    def kmean_elbow(self, cols: list, data: pd.DataFrame):
+        '''
+        A function used for performing KMeans clustering and visualizing the result
+
+        Parameter:
+            cols(list): The columns that you need to perfom KMeans on
+            data(pd.DataFrame): The data to perform KMeans
+        
+        '''
+
+        app_metrics = data[['Social_media', 'YouTube', 'Netflix', 'Google', 'Email', 'Gaming', 'Other']]
+        scaler = StandardScaler()
+        normalized_metrics = scaler.fit_transform(app_metrics)
+
+        wcss = []
+        k_values = range(1, 11)  
+
+        for k in k_values:
+            kmeans = KMeans(n_clusters=k, random_state=42)
+            kmeans.fit(normalized_metrics)
+            wcss.append(kmeans.inertia_)  
+
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(k_values, wcss, marker='o')
+        plt.title('Elbow Plot for K-means Clustering')
+        plt.xlabel('Number of clusters (k)')
+        plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
+        plt.show()        
