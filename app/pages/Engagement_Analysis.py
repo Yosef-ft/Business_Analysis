@@ -8,7 +8,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from Utils import DataUtils
+from scripts.Utils import DataUtils
 from data_loader import load_dataset
 from data_loader import plot_cluster_analysis
 from data_loader import DATA
