@@ -1,3 +1,6 @@
+import os
+import sys
+
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
@@ -8,7 +11,8 @@ import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from scripts.Utils import DataUtils
+sys.path.append((os.path.abspath('../scripts')))
+from Utils import DataUtils
 from data_loader import load_dataset
 from data_loader import plot_cluster_analysis
 from data_loader import DATA
