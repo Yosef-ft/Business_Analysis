@@ -18,7 +18,7 @@ def load_dataset():
     LIVE_DB_HOST = st.secrets['LIVE_DB_HOST']
     LIVE_DB_NAME = st.secrets['LIVE_DB_NAME']    
 
-    host = f'postgresql://{LIVE_DB_USER}:{LIVE_DB_PASSWORD}@{LIVE_DB_HOST}/{LIVE_DB_NAME}'
+    host = f'postgresql+pg8000://{LIVE_DB_USER}:{LIVE_DB_PASSWORD}@{LIVE_DB_HOST}/{LIVE_DB_NAME}'
     engine = create_engine(host)
     
     @st.cache_resource
