@@ -1,4 +1,5 @@
 import math
+import os
 import pandas as pd
 from sqlalchemy import create_engine
 import streamlit as st
@@ -11,7 +12,13 @@ from sklearn.decomposition import PCA
 
 
 def load_dataset():
-    host = 'postgresql://yosef:qAsfHTUZB0rWrbIoQCobwhj4wZECKHoH@dpg-crfur4qj1k6c73996np0-a.singapore-postgres.render.com/telecom_jvu2'
+
+    LIVE_DB_USER = st.secrets['LIVE_DB_USER']
+    LIVE_DB_PASSWORD = st.secrets['LIVE_DB_PASSWORD']
+    LIVE_DB_HOST = st.secrets['LIVE_DB_HOST']
+    LIVE_DB_NAME = st.secrets['LIVE_DB_NAME']    
+
+    host = f'postgresql://{LIVE_DB_USER}:{LIVE_DB_PASSWORD}@{LIVE_DB_HOST}/{LIVE_DB_NAME}'
     engine = create_engine(host)
     
     @st.cache_resource
