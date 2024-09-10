@@ -31,6 +31,7 @@ def load_dataset():
     return fetch_data()
 
 DATA = load_dataset()
+DATA.sort_values(by='Total_sessions', ascending=False, inplace=True)
 DATA = DATA.iloc[1:]
 
 def pca_analyzer(data: pd.DataFrame, total: bool):
