@@ -12,7 +12,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 sys.path.append((os.path.abspath('../scripts')))
-from Utils import DataUtils
+from scripts.Utils import DataUtils
+st.write(os.getcwd())
 from data_loader import load_dataset
 from data_loader import plot_cluster_analysis
 from data_loader import DATA
